@@ -42,12 +42,12 @@ export function getDailyRef(date = new Date()) {
 export async function getDailyVerse(date = new Date()) {
   const ref = getDailyRef(date);
   const encodedRef = ref.replace(/\s+/g, "+");
-  const response = await fetch(`https://dailybible.ca/api/${encodedRef}?translation=asv`);
+  const response = await fetch(`https://dailybible.ca/api/${encodedRef}?translation=WEB`);
   const data = await response.json();
 
   return {
     ref,
     text: data.text.replace(/\s+/g, " ").trim(),
-    translation: "ASV"
+    translation: "WEB"
   };
 }

@@ -90,7 +90,7 @@ function exportCard(verse, theme) {
   ctx.strokeStyle = theme.ink;
   ctx.lineWidth = 3;
   ctx.strokeRect(canvas.width / 2 - 70, 2110, 140, 70);
-  ctx.fillText("ASV", canvas.width / 2, 2162);
+  ctx.fillText("WEB", canvas.width / 2, 2162);
 
   const a = document.createElement("a");
   a.download = `daily-proverb-${shortRef.replace(":", "-")}.png`;
@@ -120,7 +120,7 @@ function App() {
           setSelected({
             ref: "Proverbs 3:5",
             text: "Trust in Jehovah with all thy heart, And lean not upon thine own understanding.",
-            translation: "ASV",
+            translation: "WEB",
           });
         }
       });
@@ -147,7 +147,7 @@ function App() {
   const shortRef = selected.ref.replace("Proverbs ", "");
 
   async function copyVerse() {
-    const text = `${selected.text} — ${selected.ref} ASV`;
+    const text = `${selected.text} — ${selected.ref} WEB`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -193,7 +193,7 @@ function App() {
           <p>{second}</p>
 
           <div className="bottom">
-            <div className="badge">ASV</div>
+            <div className="badge">WEB</div>
           </div>
         </article>
       </section>
