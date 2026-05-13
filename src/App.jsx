@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Download, Heart, Menu, Share2, X } from "lucide-react";
-import { createRoot } from "react-dom/client";
 import { getDailyVerse } from "./verses";
 import "./style.css";
 
@@ -203,4 +202,4 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+export default App;
