@@ -7,7 +7,12 @@
 body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
-  background: radial-gradient(circle at top, #d7ecff, #234360 48%, #07111d);
+  background:
+linear-gradient(
+180deg,
+#111827 0%,
+#020617 100%
+);
   color: white;
   min-height: 100vh;
 }
@@ -23,7 +28,7 @@ body {
 .menu-button {
   position: fixed;
   top: 22px;
-  right: 22px;
+  left: 22px;
   width: 48px;
   height: 48px;
   border: 0;
@@ -44,13 +49,6 @@ body {
   box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
 }
 
-.status {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 14px 18px;
-  font-weight: 800;
-  font-size: 22px;
-}
 
 .card {
   min-height: 650px;

@@ -14,6 +14,7 @@ const themes = [
 function splitVerse(text) {
   const parts = text.replace(/[.;:]$/, "").split(/[;:]/);
   if (parts.length >= 2) return [parts[0].trim(), parts.slice(1).join(";").trim()];
+
   const words = text.split(" ");
   const mid = Math.ceil(words.length / 2);
   return [words.slice(0, mid).join(" "), words.slice(mid).join(" ")];
@@ -26,6 +27,7 @@ function drawWrapped(ctx, text, x, y, maxWidth, lineHeight) {
 
   for (const word of words) {
     const test = line ? line + " " + word : word;
+
     if (ctx.measureText(test).width > maxWidth && line) {
       lines.push(line);
       line = word;
@@ -43,22 +45,29 @@ function exportCard(verse, theme) {
   const canvas = document.createElement("canvas");
   canvas.width = 1170;
   canvas.height = 2532;
+
   const ctx = canvas.getContext("2d");
+  const shortRef = verse.ref.replace("Proverbs ", "");
+  const [first, second] = splitVerse(verse.text);
 
   ctx.fillStyle = theme.bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (theme.texture) {
     ctx.globalAlpha = 0.08;
+
     for (let i = 0; i < 9000; i++) {
       ctx.fillStyle = Math.random() > 0.5 ? "#000" : "#fff";
-      ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1.5, 1.5);
+      ctx.fillRect(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        1.5,
+        1.5
+      );
     }
+
     ctx.globalAlpha = 1;
   }
-
-  const [first, second] = splitVerse(verse.text);
-  const shortRef = verse.ref.replace("Proverbs ", "");
 
   ctx.textAlign = "center";
   ctx.fillStyle = theme.ink;
@@ -81,7 +90,7 @@ function exportCard(verse, theme) {
   ctx.strokeStyle = theme.ink;
   ctx.lineWidth = 3;
   ctx.strokeRect(canvas.width / 2 - 70, 2110, 140, 70);
-  ctx.fillText("KJV", canvas.width / 2, 2162);
+  ctx.fillText("ASV", canvas.width / 2, 2162);
 
   const a = document.createElement("a");
   a.download = `daily-proverb-${shortRef.replace(":", "-")}.png`;
@@ -90,23 +99,55 @@ function exportCard(verse, theme) {
 }
 
 function App() {
-  const selected = useMemo(() => getDailyVerse(), []);
+  const [selected, setSelected] = useState(null);
   const [theme, setTheme] = useState(themes[0]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [favorites, setFavorites] = useState(() =>
     JSON.parse(localStorage.getItem("favorites") || "[]")
   );
 
-  const isFav = favorites.includes(selected.ref);
-  const [first, second] = useMemo(() => splitVerse(selected.text), [selected]);
-  const shortRef = selected.ref.replace("Proverbs ", "");
+  useEffect(() => {
+    let mounted = true;
+
+    getDailyVerse()
+      .then((verse) => {
+        if (mounted) setSelected(verse);
+      })
+      .catch((err) => {
+        console.error(err);
+
+        if (mounted) {
+          setSelected({
+            ref: "Proverbs 3:5",
+            text: "Trust in Jehovah with all thy heart, And lean not upon thine own understanding.",
+            translation: "ASV",
+          });
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
+  if (!selected) {
+    return (
+      <main className="app daily-mode">
+        <div className="loading">Loading today’s proverb...</div>
+      </main>
+    );
+  }
+
+  const isFav = favorites.includes(selected.ref);
+  const [first, second] = splitVerse(selected.text);
+  const shortRef = selected.ref.replace("Proverbs ", "");
+
   async function copyVerse() {
-    const text = `${selected.text} — ${selected.ref} KJV`;
+    const text = `${selected.text} — ${selected.ref} ASV`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -130,11 +171,13 @@ function App() {
       </button>
 
       <section className="phone solo">
-        <div className="status">7:24 <span>100</span></div>
-
         <article
           className={`card ${theme.texture ? "texture" : ""}`}
-          style={{ "--bg": theme.bg, "--ink": theme.ink, "--accent": theme.accent }}
+          style={{
+            "--bg": theme.bg,
+            "--ink": theme.ink,
+            "--accent": theme.accent,
+          }}
         >
           <div className="header-center">
             <div className="top">Daily Proverb</div>
@@ -150,7 +193,7 @@ function App() {
           <p>{second}</p>
 
           <div className="bottom">
-            <div className="badge">KJV</div>
+            <div className="badge">ASV</div>
           </div>
         </article>
       </section>
@@ -165,6 +208,7 @@ function App() {
           <p className="drawer-sub">Today’s wisdom card</p>
 
           <label>Theme</label>
+
           <div className="themes">
             {themes.map((t) => (
               <button
