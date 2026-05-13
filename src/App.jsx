@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Download, Heart, Menu, Share2, X } from "lucide-react";
 import { createRoot } from "react-dom/client";
 import { getDailyVerse } from "./verses";
@@ -58,12 +58,7 @@ function exportCard(verse, theme) {
 
     for (let i = 0; i < 9000; i++) {
       ctx.fillStyle = Math.random() > 0.5 ? "#000" : "#fff";
-      ctx.fillRect(
-        Math.random() * canvas.width,
-        Math.random() * canvas.height,
-        1.5,
-        1.5
-      );
+      ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1.5, 1.5);
     }
 
     ctx.globalAlpha = 1;
@@ -99,52 +94,20 @@ function exportCard(verse, theme) {
 }
 
 function App() {
-  const [selected, setSelected] = useState(null);
+  const [selected] = useState(() => getDailyVerse());
   const [theme, setTheme] = useState(themes[0]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [favorites, setFavorites] = useState(() =>
     JSON.parse(localStorage.getItem("favorites") || "[]")
   );
 
-  useEffect(() => {
-    let mounted = true;
-
-    getDailyVerse()
-      .then((verse) => {
-        if (mounted) setSelected(verse);
-      })
-      .catch((err) => {
-        console.error(err);
-
-        if (mounted) {
-          setSelected({
-            ref: "Proverbs 3:5",
-            text: "Trust in Jehovah with all thy heart, And lean not upon thine own understanding.",
-            translation: "WEB",
-          });
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const isFav = favorites.includes(selected.ref);
+  const [first, second] = splitVerse(selected.text);
+  const shortRef = selected.ref.replace("Proverbs ", "");
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
-
-  if (!selected) {
-    return (
-      <main className="app daily-mode">
-        <div className="loading">Loading today’s proverb...</div>
-      </main>
-    );
-  }
-
-  const isFav = favorites.includes(selected.ref);
-  const [first, second] = splitVerse(selected.text);
-  const shortRef = selected.ref.replace("Proverbs ", "");
 
   async function copyVerse() {
     const text = `${selected.text} — ${selected.ref} WEB`;
