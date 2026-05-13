@@ -1097,14 +1097,11 @@ export const proverbs = [
 ];
 
 export function getDailyVerse(date = new Date()) {
-  const seed =
-    date.getFullYear() * 1000 +
-    Math.floor(
-      (date - new Date(date.getFullYear(), 0, 0)) / 86400000
-    );
+  const start = new Date(date.getFullYear(), 0, 0);
+  const day = Math.floor((date - start) / 86400000);
 
-  const random = Math.sin(seed) * 10000;
-  const index = Math.floor((random - Math.floor(random)) * proverbs.length);
+  const seed = date.getFullYear() * 1000 + day;
+  const index = Math.abs(Math.floor(Math.sin(seed) * 10000)) % proverbs.length;
 
   return proverbs[index];
 }
